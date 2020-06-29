@@ -13,4 +13,5 @@ to passwords stored on another machine.
 
 To solve this, Sentry is a lightweight password server that can be easily accessed anywhere (with internet
 access). Your master password is hashed before stored, and all other passwords are stored using AES that
-can only be unlocked by your master key.
+can only be unlocked by your master key. All connections between you and the sentry-server is secure
+through RSA.
