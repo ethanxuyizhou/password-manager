@@ -1,6 +1,6 @@
 (library
  (name sentry_lib)
- (libraries core async cryptokit sha async_interactive)
+ (libraries core async async_interactive sentry_kernel)
  (preprocess (pps ppx_jane ppx_inline_test))
  (inline_tests)
 )

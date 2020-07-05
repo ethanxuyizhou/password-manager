@@ -38,6 +38,11 @@ let remove_user_v1 =
     ~bin_query:User_and_password.Stable.V1.bin_t
     ~bin_response:(Or_error.Stable.V2.bin_t Unit.Stable.V1.bin_t)
 
+let list_password_entries_v1 =
+  Rpc.Rpc.create ~name:"list-password-entries" ~version:1
+    ~bin_query:User_and_password.Stable.V1.bin_t
+    ~bin_response:(Or_error.Stable.V2.bin_t (List.Stable.V1.bin_t String.Stable.V1.bin_t))
+
 let add_password_entry_v1 =
   Rpc.Rpc.create ~name:"add-password-entry" ~version:1
     ~bin_query:Entry_info.Stable.V1.bin_t

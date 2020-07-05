@@ -79,6 +79,7 @@ B /Users/ethan/.opam/default/lib/variantslib
 B /Users/ethan/.opam/default/lib/zarith
 B ../../../../_build/default/sentry/src/lib/.sentry_lib.objs/byte
 B ../../../../_build/default/sentry/src/rpcs/.sentry_rpcs.objs/byte
+B ../../../../_build/default/sentry/src/sentry_kernel/.sentry_kernel.objs/byte
 B ../../../../_build/default/sentry/src/server/.sentry_server.objs/byte
 B ../../../../_build/default/sentry/src/server/bin/.main.eobjs/byte
 B ../../../../_build/default/sentry/src/state/.sentry_state.objs/byte
@@ -162,6 +163,7 @@ S /Users/ethan/.opam/default/lib/variantslib
 S /Users/ethan/.opam/default/lib/zarith
 S ../../lib
 S ../../rpcs
+S ../../sentry_kernel
 S ..
 S .
 S ../../state

@@ -1,5 +1,6 @@
 open! Core
 open! Async
+open Sentry_kernel
 open Sentry_lib
 open Sentry_state
 
@@ -16,6 +17,12 @@ let remove_user_v1 t { Sentry_rpcs.User_and_password.user; master_password } =
   let hashed_master_password = Cryptography.Aes.hash master_password in
   Tlog.write_update t.tlog_service
     (Update.Remove_user { user; hashed_master_password })
+
+let list_password_entries_v1 t { Sentry_rpcs.User_and_password.user; master_password } =
+  let hashed_master_password = Cryptography.Aes.hash master_password in
+  let state = Tlog.read_state t.tlog_service in
+  State.lookup_password_entries state ~user ~hashed_master_password
+  |> Deferred.return
 
 let add_password_entry_v1 t
     { Sentry_rpcs.Entry_info.user; master_password; entry; entry_password } =
@@ -54,6 +61,7 @@ let implementations =
     [
       Rpc.Rpc.implement Sentry_rpcs.add_user_v1 add_user_v1;
       Rpc.Rpc.implement Sentry_rpcs.remove_user_v1 remove_user_v1;
+      Rpc.Rpc.implement Sentry_rpcs.list_password_entries_v1 list_password_entries_v1;
       Rpc.Rpc.implement Sentry_rpcs.add_password_entry_v1 add_password_entry_v1;
       Rpc.Rpc.implement Sentry_rpcs.remove_password_entry_v1
         remove_password_entry_v1;

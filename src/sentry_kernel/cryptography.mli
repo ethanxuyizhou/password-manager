@@ -1,5 +1,4 @@
-open! Core
-open! Async
+open! Core_kernel
 open! Import
 
 (* This module is a wrapper around some of the modules in

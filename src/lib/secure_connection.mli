@@ -1,9 +1,10 @@
 open! Core
 open! Async
+open Sentry_kernel
 
 val connect :
   where_to_connect:Tcp.Where_to_connect.inet ->
-  Rpc.Connection.t Deferred.Or_error.t
+  Rpc.Connection.t Or_error.t Deferred.t
 
 module Server : sig
   val create :

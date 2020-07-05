@@ -79,6 +79,7 @@ B /Users/ethan/.opam/default/lib/variantslib
 B /Users/ethan/.opam/default/lib/zarith
 B ../../../_build/default/sentry/src/lib/.sentry_lib.objs/byte
 B ../../../_build/default/sentry/src/rpcs/.sentry_rpcs.objs/byte
+B ../../../_build/default/sentry/src/sentry_kernel/.sentry_kernel.objs/byte
 B ../../../_build/default/sentry/src/server/.sentry_server.objs/byte
 B ../../../_build/default/sentry/src/state/.sentry_state.objs/byte
 S /Users/ethan/.opam/default/lib/async
@@ -161,6 +162,7 @@ S /Users/ethan/.opam/default/lib/variantslib
 S /Users/ethan/.opam/default/lib/zarith
 S ../lib
 S ../rpcs
+S ../sentry_kernel
 S .
 S ../state
 FLG -ppx '/Users/ethan/Desktop/project/ocaml/_build/default/.ppx/57ef275c515ec1fe105f6ff0979f5a61/ppx.exe --as-ppx --cookie '\''library-name="sentry_server"'\'''

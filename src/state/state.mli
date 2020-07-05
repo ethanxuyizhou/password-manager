@@ -9,6 +9,12 @@ include
      and module Update = Update
      and type Update_result.t = unit Or_error.t
 
+val lookup_password_entries :
+  t ->
+  user:string ->
+  hashed_master_password:string ->
+  string list Or_error.t
+
 val lookup_password :
   t ->
   user:string ->

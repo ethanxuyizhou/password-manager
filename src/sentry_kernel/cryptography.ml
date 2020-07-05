@@ -1,5 +1,4 @@
-open! Core
-open! Async
+open! Core_kernel
 open! Import
 
 (* Use the [escape] char for padding. Consider using a better key *)

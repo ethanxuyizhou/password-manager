@@ -27,6 +27,7 @@ module Data = struct
                 Map.set t.encrypted_passwords ~key:entry
                   ~data:encrypted_password;
             }
+    (* TODO: refactor the error code *)
     else Or_error.errorf !"Invalid password"
 
   let remove_entry t ~hashed_master_password ~entry =
@@ -40,6 +41,11 @@ module Data = struct
       | Some encrypted_password -> Ok encrypted_password
       | None -> Or_error.errorf !"No such entry: %s" entry
     else Or_error.errorf !"Invalid password"
+
+  let all t ~hashed_master_password =
+    if validate_password t hashed_master_password then
+    Ok t.encrypted_passwords
+    else Or_error.errorf !"Incorrect password"
 end
 
 module Update = Update
@@ -92,7 +98,15 @@ let apply_update t update =
           | Ok data -> (Map.set t ~key:user ~data, Ok ())
           | Error err -> (t, Error err) ) )
 
+let lookup_password_entries t ~user ~hashed_master_password =
+  match Map.find t user with
+  | None -> no_user_error ~user
+  | Some data -> 
+    let%map.Or_error data = Data.all data ~hashed_master_password
+    in
+    Map.keys data
+
 let lookup_password t ~user ~hashed_master_password ~entry =
   match Map.find t user with
   | None -> no_user_error ~user
-  | Some data -> Data.find data ~hashed_master_password ~entry
+  | Some data -> Data.find data ~hashed_master_password ~entry 

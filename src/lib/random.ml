@@ -1,5 +1,5 @@
-open! Core
-open! Async
+open! Core_kernel
+open! Async_kernel
 include Random
 
 let substitute_one_random_character string ~rand_int ~excluding_indices =
@@ -55,14 +55,14 @@ let%expect_test "test ascii ranges are correct" =
     |> String.concat ~sep:"," |> print_string
   in
   print_ascii_chars ~lower:33 ~upper:122;
-  let%bind () =
+  let () =
     [%expect
       {| !,",#,$,%,&,',(,),*,+,,,-,.,/,0,1,2,3,4,5,6,7,8,9,:,;,<,=,>,?,@,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,[,\,],^,_,`,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z |}]
   in
   print_ascii_chars ~lower:48 ~upper:57;
-  let%bind () = [%expect {| 0,1,2,3,4,5,6,7,8,9 |}] in
+  let () = [%expect {| 0,1,2,3,4,5,6,7,8,9 |}] in
   print_ascii_chars ~lower:97 ~upper:122;
-  let%bind () =
+  let () =
     [%expect {| a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z |}]
   in
   print_ascii_chars ~lower:65 ~upper:90;
