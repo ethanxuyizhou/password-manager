@@ -37,10 +37,10 @@ end
 
 let command =
   Command.async_or_error ~summary:""
-    (let%map.Command.Let_syntax args = Arg.parse () in
+    (let%map.Command args = Arg.parse () in
      fun () ->
        let open Deferred.Let_syntax in
-       let%bind.Deferred.Or_error.Let_syntax () =
+       let%bind.Deferred.Or_error () =
          if args.length > 256 || args.length < 1 then
            Deferred.Or_error.errorf "Length cannot exceed 256 or be less than 1"
          else Deferred.Or_error.ok_unit
@@ -52,7 +52,7 @@ let command =
        let%bind entry =
          Interactive.ask_user "Enter the name of the entry you'd like to add:"
        in
-       let%bind.Deferred.Or_error.Let_syntax entry_password =
+       let%bind.Deferred.Or_error entry_password =
          match%bind
            Async_interactive.ask_yn
              "Do you want a randomly generated password for you?"

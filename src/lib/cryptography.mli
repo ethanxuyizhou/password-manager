@@ -2,6 +2,10 @@ open! Core
 open! Async
 open! Import
 
+(* This module is a wrapper around some of the modules in
+ * the Cryptokit library in order to make it more typeful
+ * and easier to use *)
+
 module Aes : sig
   val encrypt : key:string -> data:string -> string
 

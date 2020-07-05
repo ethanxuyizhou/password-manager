@@ -2,7 +2,8 @@ open! Core
 open! Async
 open! Import
 
-let pad_char = Char.of_int_exn 64
+(* Use the [escape] char for padding. Consider using a better key *)
+let pad_char = Char.of_int_exn 27
 
 let pad ?(char = pad_char) string ~len =
   let pad_string =
@@ -40,6 +41,8 @@ module Aes = struct
 end
 
 module Rsa = struct
+  (* Definition copied from the [cryptokit] library in order to 
+   * derive sexp, bin_io *)
   type 'a t = {
     size : int;  (** Size of the modulus [n], in bits *)
     n : string;  (** Modulus [n = p.q] *)

@@ -16,7 +16,7 @@ let command =
         Interactive.ask_user
           "Enter the name of the password entry you'd like to access:"
       in
-      let%map.Deferred.Or_error.Let_syntax entry_password =
+      let%map.Deferred.Or_error entry_password =
         Sentry_server_connection.with_close ~f:(fun connection ->
             Rpc.Rpc.dispatch_exn Sentry_rpcs.get_password_entry_v1 connection
               {

@@ -8,7 +8,7 @@ let make_secure_transport ?(private_key = Cryptography.Rsa.create ()) reader
   don't_wait_for
     (Pipe.write_if_open writer
        (sprintf !"%{Cryptography.Rsa.Public}" public_key));
-  let%bind.Deferred.Or_error.Let_syntax other_side_public_key =
+  let%bind.Deferred.Or_error other_side_public_key =
     match%bind Pipe.read reader with
     | `Ok a -> Cryptography.Rsa.Public.of_string a |> Deferred.Or_error.return
     | `Eof ->
@@ -36,7 +36,7 @@ let connect ~where_to_connect =
     Time_ns.add (Time_ns.now ())
       (Time_ns.Span.of_span_float_round_nearest handshake_timeout)
   in
-  let%bind.Deferred.Or_error.Let_syntax sock =
+  let%bind.Deferred.Or_error sock =
     Monitor.try_with_or_error (fun () ->
         Tcp.connect_sock ~timeout:handshake_timeout where_to_connect)
   in
@@ -47,8 +47,8 @@ let connect ~where_to_connect =
   let handshake_timeout = Time_ns.diff finish_handshake_by (Time_ns.now ()) in
   let reader = Reader.create (Socket.fd sock) |> Reader.pipe in
   let writer = Writer.create (Socket.fd sock) |> Writer.pipe in
-  let%bind.Deferred.Or_error.Let_syntax transport =
-    let%map.Deferred.Or_error.Let_syntax reader, writer =
+  let%bind.Deferred.Or_error transport =
+    let%map.Deferred.Or_error reader, writer =
       make_secure_transport reader writer
     in
     let max_message_size = 100 * 1024 * 1024 in
