@@ -1,5 +1,5 @@
 (library
  (name sentry_server)
- (libraries core async sentry_rpcs sentry_lib sentry_state)
+ (libraries core async sentry_rpcs sentry_lib sentry_state websocket-async)
  (preprocess (pps ppx_jane))
 )
