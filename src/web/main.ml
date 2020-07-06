@@ -4,8 +4,9 @@ open! Async_js
 open! Bonsai_web.Future
 
 let run () =  
+  Async_js.init ();
   let%bind send_rpc =
-    let%map connection = Rpc.Connection.client_exn () in
+    let%map connection = Rpc.Connection.client_exn ~uri:(Uri.of_string "ws://localhost") () in
     (fun (protocol, query) -> 
       Rpc.Rpc.dispatch_exn protocol connection query)
     |> Effect.of_deferred_fun
