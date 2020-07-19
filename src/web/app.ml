@@ -14,8 +14,19 @@ module Model = struct
 
   let apply_redirection_if_necessary model =
     match model.currently_rendering with
-    | All.Login -> {model with currently_rendering = Login.next_step model.login }
-    | All.Home -> model
+    | All.Login ->
+      ( match Login.next_step model.login with
+        | Login -> model
+        | Home -> 
+          let home = 
+            Home.Model.Fields.create 
+              ~user:(Login.Model.login_name model.login)
+              ~master_password:(Login.Model.login_password model.login)
+              ~password_entries:[]
+          in
+          { model with home ; currently_rendering = Home; }
+      )
+    | All.Home -> {model with currently_rendering = Home.next_step model.home}
 
   let update model ?home ?login () =
     let model = Option.value_map home ~default:model ~f:(fun home -> { model with home = home }) in
@@ -34,7 +45,7 @@ end
 let build ((model : Model.t), apply_action) ~send_rpc =
   match model.currently_rendering with
   | All.Login -> Login.build (model.login, (fun action -> apply_action (Action.Login action))) ~send_rpc
-  | Home -> Home.build (model.home, (fun action -> apply_action (Action.Home action))) 
+  | Home -> Home.build (model.home, (fun action -> apply_action (Action.Home action))) ~send_rpc 
 
 let apply_action ~inject:_ ~schedule_event:_ (model : Model.t) action =
   match action with

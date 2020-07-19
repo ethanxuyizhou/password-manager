@@ -3,7 +3,7 @@ open! Async_kernel
 open Bonsai_web.Future
 
 module Model = struct
-  type t = { login_name : string; login_password : string; login_status : bool option} [@@deriving sexp, equal]
+  type t = { login_name : string; login_password : string; login_status : bool option} [@@deriving sexp, equal, fields]
 
   let default = { login_name = ""; login_password = ""; login_status = None } 
 end
@@ -16,11 +16,11 @@ module Action = struct
   [@@deriving sexp]
 end
 
-let apply_action (model : Model.t) action = 
+let apply_action (model : Model.t) ( action : Action.t ) = 
   match action with
-  |  (Action.Update_login_name login) ->  { model with login_name = login}
-  |  (Action.Update_login_password password) -> {model with login_password = password }
-  |  (Action.Update_login_status status) -> { model with login_status = Some status }   
+  |  (Update_login_name login) ->  { model with login_name = login}
+  |  (Update_login_password password) -> {model with login_password = password }
+  |  (Update_login_status status) -> { model with login_status = Some status }   
 
 
 let build ((model : Model.t), apply_action) ~send_rpc =
@@ -47,8 +47,8 @@ let build ((model : Model.t), apply_action) ~send_rpc =
   let login_or_fail () = 
     send_rpc (Sentry_rpcs.list_password_entries_v1, { Sentry_rpcs.User_and_password.user = model.login_name; master_password = model.login_password})
     |> Effect.inject ~on_response:(function
-          | Error _err -> apply_action (Action.Update_login_status false)
-          | Ok _entries -> apply_action (Action.Update_login_status true))
+          | Error (_ : Error.t) -> apply_action (Action.Update_login_status false)
+          | Ok ( _ : string list) -> apply_action (Action.Update_login_status true))
   in
   let login_button =
     Vdom.Node.button
