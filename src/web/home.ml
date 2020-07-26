@@ -29,11 +29,11 @@ let build ((model : Model.t), apply_action) ~send_rpc=
       ) in
   let refresh_button = 
     Vdom.Node.button 
-      [ Vdom.Attr.on_click (fun _ev -> refresh_password_entries ())] 
+      [ Vdom.Attr.on_click (fun _ev -> refresh_password_entries ()); Vdom.Attr.style (Css_gen.margin_bottom (`Px 10)) ] 
       [ Vdom.Node.text "Refresh" ] 
   in
   let password_entries = 
-    List.map model.password_entries ~f:Vdom.Node.text
+    List.map model.password_entries ~f:(fun password_entry -> Vdom.Node.div [ Vdom.Attr.style (Css_gen.margin_bottom (`Px 10)) ] [ Vdom.Node.text password_entry ])
   in
   Vdom.Node.div [] ([refresh_button] @ password_entries)
 

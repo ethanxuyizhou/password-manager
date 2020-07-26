@@ -42,7 +42,7 @@ let build ((model : Model.t), apply_action) ~send_rpc =
   in
   let password_box = 
     Vdom.Node.div 
-      [ Vdom.Attr.id "password-box" ]
+      [ Vdom.Attr.id "password-box"; Vdom.Attr.style (Css_gen.text_align `Center) ]
       [ Vdom.Node.input
         [
           Vdom.Attr.type_ "password";
