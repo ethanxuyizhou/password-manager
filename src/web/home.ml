@@ -2,8 +2,6 @@ open! Core_kernel
 open! Async_kernel
 open Bonsai_web.Future
 
-let self = All.Home
-
 module Model = struct
   type t = { user : string; master_password : string; password_entries : string list } 
   [@@deriving sexp, equal, fields]
@@ -37,6 +35,6 @@ let build ((model : Model.t), apply_action) ~send_rpc=
   let password_entries = 
     List.map model.password_entries ~f:Vdom.Node.text
   in
-  Vdom.Node.body [] ([refresh_button] @ password_entries)
+  Vdom.Node.div [] ([refresh_button] @ password_entries)
 
-let next_step (_ : Model.t) = self
+let next_step (_ : Model.t) = All.Home
