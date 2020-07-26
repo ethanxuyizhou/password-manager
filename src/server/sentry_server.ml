@@ -18,7 +18,8 @@ let remove_user_v1 t { Sentry_rpcs.User_and_password.user; master_password } =
   Tlog.write_update t.tlog_service
     (Update.Remove_user { user; hashed_master_password })
 
-let list_password_entries_v1 t { Sentry_rpcs.User_and_password.user; master_password } =
+let list_password_entries_v1 t
+    { Sentry_rpcs.User_and_password.user; master_password } =
   let hashed_master_password = Cryptography.Aes.hash master_password in
   let state = Tlog.read_state t.tlog_service in
   State.lookup_password_entries state ~user ~hashed_master_password
@@ -61,7 +62,8 @@ let implementations =
     [
       Rpc.Rpc.implement Sentry_rpcs.add_user_v1 add_user_v1;
       Rpc.Rpc.implement Sentry_rpcs.remove_user_v1 remove_user_v1;
-      Rpc.Rpc.implement Sentry_rpcs.list_password_entries_v1 list_password_entries_v1;
+      Rpc.Rpc.implement Sentry_rpcs.list_password_entries_v1
+        list_password_entries_v1;
       Rpc.Rpc.implement Sentry_rpcs.add_password_entry_v1 add_password_entry_v1;
       Rpc.Rpc.implement Sentry_rpcs.remove_password_entry_v1
         remove_password_entry_v1;
@@ -98,8 +100,7 @@ let start_command =
             let ws_read, ws_to_app = Pipe.create () in
             don't_wait_for
               (let%bind _ =
-                 Websocket_async.server ~reader ~writer ~app_to_ws ~ws_to_app
-                   ()
+                 Websocket_async.server ~reader ~writer ~app_to_ws ~ws_to_app ()
                in
                Deferred.unit);
             let pipe_r, pipe_w =
@@ -109,8 +110,7 @@ let start_command =
               upon (Pipe.closed ws_write) (fun () -> Pipe.close w2);
               don't_wait_for
                 (Pipe.transfer ws_read w1
-                   ~f:(fun Websocket.Frame.
-                             { opcode; extension; final; content }
+                   ~f:(fun Websocket.Frame.{ opcode; extension; final; content }
                            ->
                      ignore (opcode : Websocket.Frame.Opcode.t);
                      ignore (extension : int);
@@ -127,7 +127,8 @@ let start_command =
               Pipe_transport.create Pipe_transport.Kind.string pipe_r pipe_w
             in
             Rpc.Connection.server_with_close transport ~implementations
-              ~connection_state:(fun (_ : Rpc.Connection.t) -> t) ~on_handshake_error:`Ignore)
+              ~connection_state:(fun (_ : Rpc.Connection.t) -> t)
+              ~on_handshake_error:`Ignore)
       in
       Deferred.never ())
 

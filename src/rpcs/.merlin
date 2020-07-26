@@ -15,7 +15,6 @@ B /Users/ethan/.opam/default/lib/core_kernel
 B /Users/ethan/.opam/default/lib/core_kernel/base_for_tests
 B /Users/ethan/.opam/default/lib/core_kernel/moption
 B /Users/ethan/.opam/default/lib/core_kernel/pairing_heap
-B /Users/ethan/.opam/default/lib/core_kernel/sexp_hidden_in_test
 B /Users/ethan/.opam/default/lib/core_kernel/thread_pool_cpu_affinity
 B /Users/ethan/.opam/default/lib/core_kernel/thread_safe_queue
 B /Users/ethan/.opam/default/lib/core_kernel/timing_wheel
@@ -32,7 +31,6 @@ B /Users/ethan/.opam/default/lib/ppx_enumerate/runtime-lib
 B /Users/ethan/.opam/default/lib/ppx_expect/collector
 B /Users/ethan/.opam/default/lib/ppx_expect/common
 B /Users/ethan/.opam/default/lib/ppx_expect/config
-B /Users/ethan/.opam/default/lib/ppx_expect/config_types
 B /Users/ethan/.opam/default/lib/ppx_hash/runtime-lib
 B /Users/ethan/.opam/default/lib/ppx_here/runtime-lib
 B /Users/ethan/.opam/default/lib/ppx_inline_test/config
@@ -64,7 +62,6 @@ S /Users/ethan/.opam/default/lib/core_kernel
 S /Users/ethan/.opam/default/lib/core_kernel/base_for_tests
 S /Users/ethan/.opam/default/lib/core_kernel/moption
 S /Users/ethan/.opam/default/lib/core_kernel/pairing_heap
-S /Users/ethan/.opam/default/lib/core_kernel/sexp_hidden_in_test
 S /Users/ethan/.opam/default/lib/core_kernel/thread_pool_cpu_affinity
 S /Users/ethan/.opam/default/lib/core_kernel/thread_safe_queue
 S /Users/ethan/.opam/default/lib/core_kernel/timing_wheel
@@ -81,7 +78,6 @@ S /Users/ethan/.opam/default/lib/ppx_enumerate/runtime-lib
 S /Users/ethan/.opam/default/lib/ppx_expect/collector
 S /Users/ethan/.opam/default/lib/ppx_expect/common
 S /Users/ethan/.opam/default/lib/ppx_expect/config
-S /Users/ethan/.opam/default/lib/ppx_expect/config_types
 S /Users/ethan/.opam/default/lib/ppx_hash/runtime-lib
 S /Users/ethan/.opam/default/lib/ppx_here/runtime-lib
 S /Users/ethan/.opam/default/lib/ppx_inline_test/config

@@ -2,7 +2,8 @@ open! Core_kernel
 open! Async_kernel
 open! Async_rpc_kernel
 
-let make_secure_transport ?(private_key = Cryptography.Rsa.create ()) reader writer =
+let make_secure_transport ?(private_key = Cryptography.Rsa.create ()) reader
+    writer =
   let public_key = Cryptography.Rsa.public_key private_key in
   don't_wait_for
     (Pipe.write_if_open writer
@@ -22,6 +23,4 @@ let make_secure_transport ?(private_key = Cryptography.Rsa.create ()) reader wri
         Pipe.transfer reader writer ~f:(fun str ->
             Cryptography.Rsa.encrypt other_side_public_key str))
   in
-  reader, writer
-
-
+  (reader, writer)
