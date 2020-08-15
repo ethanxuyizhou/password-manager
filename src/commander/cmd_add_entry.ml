@@ -1,5 +1,5 @@
-open! Core
-open! Async
+open Core
+open Async
 open Sentry_lib
 
 module Args = struct
@@ -11,8 +11,7 @@ module Args = struct
   }
 
   let parse () =
-    let open Command.Let_syntax in
-    let%map_open () = return ()
+    let%map_open.Command () = return ()
     and length =
       flag "length"
         (optional_with_default 32 int)
