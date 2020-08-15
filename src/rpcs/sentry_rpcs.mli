@@ -32,7 +32,8 @@ val add_user_v1 : (User_and_password.t, unit Or_error.t) Rpc.Rpc.t
 
 val remove_user_v1 : (User_and_password.t, unit Or_error.t) Rpc.Rpc.t
 
-val list_password_entries_v1 : (User_and_password.t, string list Or_error.t) Rpc.Rpc.t
+val list_password_entries_v1 :
+  (User_and_password.t, string list Or_error.t) Rpc.Rpc.t
 
 val add_password_entry_v1 : (Entry_info.t, unit Or_error.t) Rpc.Rpc.t
 

@@ -20,7 +20,6 @@ let random_string' ~length ~rand_int =
 let random_string ?must_include_numbers ?must_include_uppercase_letters
     ?must_include_lowercase_letters ~length () =
   Random.self_init ();
-  let open Or_error.Let_syntax in
   let string =
     random_string' ~length ~rand_int:(fun () -> Random.int_incl 33 122)
   in
@@ -34,18 +33,18 @@ let random_string ?must_include_numbers ?must_include_uppercase_letters
     |> List.filter ~f:(fun (requirement, _) -> Option.is_some requirement)
     |> List.map ~f:snd
   in
-  let%map () =
-    let number_of_requirements = List.length rand_int_generators in
-    if number_of_requirements > length then
+  let number_of_requirements = List.length rand_int_generators in
+  match number_of_requirements > length with
+  | true ->
       Or_error.errorf
         !"Length (%d) must be greater than the total number of requirements \
           (%d)"
         length number_of_requirements
-    else Ok ()
-  in
-  let excluding_indices = Int.Hash_set.create () in
-  List.fold rand_int_generators ~init:string ~f:(fun string rand_int ->
-      substitute_one_random_character string ~rand_int ~excluding_indices)
+  | false ->
+      let excluding_indices = Int.Hash_set.create () in
+      List.fold rand_int_generators ~init:string ~f:(fun string rand_int ->
+          substitute_one_random_character string ~rand_int ~excluding_indices)
+      |> Or_error.return
 
 let%expect_test "test ascii ranges are correct" =
   let print_ascii_chars ~lower ~upper =

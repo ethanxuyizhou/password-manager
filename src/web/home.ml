@@ -43,12 +43,12 @@ let build ((model : Model.t), apply_action) ~send_rpc =
       ]
       [ Vdom.Node.text "Refresh" ]
   in
+  let o item = Vdom.Node.tr [] [ Vdom.Node.td [] [ Vdom.Node.text item ] ] in
   let password_entries =
-    List.map model.password_entries ~f:(fun password_entry ->
-        Vdom.Node.div
-          [ Vdom.Attr.style (Css_gen.margin_bottom (`Px 10)) ]
-          [ Vdom.Node.text password_entry ])
+    Vdom.Node.table []
+      (List.map model.password_entries ~f:(fun password_entry ->
+           o password_entry))
   in
-  Vdom.Node.div [] ([ refresh_button ] @ password_entries)
+  Vdom.Node.div [] [ refresh_button; password_entries ]
 
 let next_step (_ : Model.t) = All.Home

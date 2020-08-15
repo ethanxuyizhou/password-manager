@@ -22,8 +22,7 @@ let list_password_entries_v1 t
     { Sentry_rpcs.User_and_password.user; master_password } =
   let hashed_master_password = Cryptography.Aes.hash master_password in
   let state = Tlog.read_state t.tlog_service in
-  State.lookup_password_entries state ~user ~hashed_master_password
-  |> Deferred.return
+  State.lookup_password_entries state ~user ~hashed_master_password |> return
 
 let add_password_entry_v1 t
     { Sentry_rpcs.Entry_info.user; master_password; entry; entry_password } =
@@ -45,17 +44,15 @@ let remove_password_entry_v1 t
 let get_password_entry_v1 t
     { Sentry_rpcs.Entry_info.user; master_password; entry; entry_password = _ }
     =
-  let open Deferred.Or_error.Let_syntax in
   let hashed_master_password = Cryptography.Aes.hash master_password in
   let state = Tlog.read_state t.tlog_service in
-  let%map encrypted_password =
-    State.lookup_password state ~user ~hashed_master_password ~entry
-    |> Deferred.return
-  in
-  let result =
-    Cryptography.Aes.decrypt ~key:master_password ~data:encrypted_password
-  in
-  result
+  match State.lookup_password state ~user ~hashed_master_password ~entry with
+  | Error _ as err -> return err
+  | Ok encrypted_password ->
+      let result =
+        Cryptography.Aes.decrypt ~key:master_password ~data:encrypted_password
+      in
+      return (Ok result)
 
 let implementations =
   let implementations =
@@ -75,68 +72,66 @@ let implementations =
 
 let start_command =
   Command.async ~summary:"Sentry server"
-    (let open Command.Let_syntax in
-    let%map_open () = return ()
-    and port =
-      flag "port" (required int)
-        ~doc:"PORT port number that the server will accept request in"
-    in
-    fun () ->
-      let open Deferred.Let_syntax in
-      let t = create () in
-      let%bind _ =
-        let private_key = Cryptography.Rsa.create () in
-        Secure_connection.Server.create ~private_key
-          ~where_to_listen:(Tcp.Where_to_listen.of_port port) (fun r w ->
-            Rpc.Connection.server_with_close r w ~implementations
-              ~connection_state:(fun (_ : Rpc.Connection.t) -> t)
-              ~on_handshake_error:`Ignore)
-      in
-      let%bind _ =
-        let open Async_rpc_kernel in
-        Tcp.Server.create ~on_handler_error:`Ignore
-          (Tcp.Where_to_listen.of_port 80) (fun _ reader writer ->
-            let app_to_ws, ws_write = Pipe.create () in
-            let ws_read, ws_to_app = Pipe.create () in
-            don't_wait_for
-              (let%bind _ =
-                 Websocket_async.server ~reader ~writer ~app_to_ws ~ws_to_app ()
-               in
-               Deferred.unit);
-            let pipe_r, pipe_w =
-              let r1, w1 = Pipe.create () in
-              let r2, w2 = Pipe.create () in
-              upon (Pipe.closed ws_read) (fun () -> Pipe.close_read r1);
-              upon (Pipe.closed ws_write) (fun () -> Pipe.close w2);
-              don't_wait_for
-                (Pipe.transfer ws_read w1
-                   ~f:(fun Websocket.Frame.{ opcode; extension; final; content }
-                           ->
-                     ignore (opcode : Websocket.Frame.Opcode.t);
-                     ignore (extension : int);
-                     ignore (final : bool);
-                     content));
-              don't_wait_for
-                (Pipe.iter r2 ~f:(fun content ->
-                     Pipe.write_if_open ws_write
-                       (Websocket.Frame.create
-                          ~opcode:Websocket.Frame.Opcode.Binary ~content ())));
-              (r1, w2)
-            in
-            let transport =
-              Pipe_transport.create Pipe_transport.Kind.string pipe_r pipe_w
-            in
-            Rpc.Connection.server_with_close transport ~implementations
-              ~connection_state:(fun (_ : Rpc.Connection.t) -> t)
-              ~on_handshake_error:`Ignore)
-      in
-      Deferred.never ())
+    (let%map_open.Command () = return ()
+     and port =
+       flag "port" (required int)
+         ~doc:"PORT port number that the server will accept request in"
+     in
+     fun () ->
+       let t = create () in
+       let%bind _ =
+         let private_key = Cryptography.Rsa.create () in
+         Secure_connection.Server.create ~private_key
+           ~where_to_listen:(Tcp.Where_to_listen.of_port port) (fun r w ->
+             Rpc.Connection.server_with_close r w ~implementations
+               ~connection_state:(fun (_ : Rpc.Connection.t) -> t)
+               ~on_handshake_error:`Ignore)
+       in
+       let%bind _ =
+         let open Async_rpc_kernel in
+         Tcp.Server.create ~on_handler_error:`Ignore
+           (Tcp.Where_to_listen.of_port 80) (fun _ reader writer ->
+             let app_to_ws, ws_write = Pipe.create () in
+             let ws_read, ws_to_app = Pipe.create () in
+             don't_wait_for
+               (let%bind _ =
+                  Websocket_async.server ~reader ~writer ~app_to_ws ~ws_to_app
+                    ()
+                in
+                Deferred.unit);
+             let pipe_r, pipe_w =
+               let r1, w1 = Pipe.create () in
+               let r2, w2 = Pipe.create () in
+               upon (Pipe.closed ws_read) (fun () -> Pipe.close_read r1);
+               upon (Pipe.closed ws_write) (fun () -> Pipe.close w2);
+               don't_wait_for
+                 (Pipe.transfer ws_read w1
+                    ~f:(fun Websocket.Frame.
+                              { opcode; extension; final; content }
+                            ->
+                      ignore (opcode : Websocket.Frame.Opcode.t);
+                      ignore (extension : int);
+                      ignore (final : bool);
+                      content));
+               don't_wait_for
+                 (Pipe.iter r2 ~f:(fun content ->
+                      Pipe.write_if_open ws_write
+                        (Websocket.Frame.create
+                           ~opcode:Websocket.Frame.Opcode.Binary ~content ())));
+               (r1, w2)
+             in
+             let transport =
+               Pipe_transport.create Pipe_transport.Kind.string pipe_r pipe_w
+             in
+             Rpc.Connection.server_with_close transport ~implementations
+               ~connection_state:(fun (_ : Rpc.Connection.t) -> t)
+               ~on_handshake_error:`Ignore)
+       in
+       Deferred.never ())
 
 let init_command =
   Command.async ~summary:"Initialize tlog state"
-    (let open Command.Let_syntax in
-    let%map_open () = return () in
-    fun () ->
-      let open Deferred.Let_syntax in
-      let%bind () = Tlog.Service.create () |> Tlog.Service.init in
-      Deferred.unit)
+    (let%map_open.Command () = return () in
+     fun () ->
+       let%bind () = Tlog.Service.create () |> Tlog.Service.init in
+       Deferred.unit)

@@ -8,19 +8,20 @@ let make_secure_transport ?(private_key = Cryptography.Rsa.create ()) reader
   don't_wait_for
     (Pipe.write_if_open writer
        (sprintf !"%{Cryptography.Rsa.Public}" public_key));
-  let%map.Deferred.Or_error other_side_public_key =
-    match%bind Pipe.read reader with
-    | `Ok a -> Cryptography.Rsa.Public.of_string a |> Deferred.Or_error.return
-    | `Eof ->
-        Deferred.Or_error.errorf
-          "Did not receive public key from the server side"
-  in
-  let reader =
-    Pipe.map reader ~f:(fun str -> Cryptography.Rsa.decrypt private_key str)
-  in
-  let writer =
-    Pipe.create_writer (fun reader ->
-        Pipe.transfer reader writer ~f:(fun str ->
-            Cryptography.Rsa.encrypt other_side_public_key str))
-  in
-  (reader, writer)
+  match%bind Pipe.read reader with
+  | `Eof ->
+      Deferred.Or_error.errorf
+        "Did not receive the public key from the other side of the rpc call"
+  | `Ok other_side_public_key ->
+      let other_side_public_key =
+        Cryptography.Rsa.Public.of_string other_side_public_key
+      in
+      let reader =
+        Pipe.map reader ~f:(fun str -> Cryptography.Rsa.decrypt private_key str)
+      in
+      let writer =
+        Pipe.create_writer (fun reader ->
+            Pipe.transfer reader writer ~f:(fun str ->
+                Cryptography.Rsa.encrypt other_side_public_key str))
+      in
+      Deferred.Or_error.return (reader, writer)
